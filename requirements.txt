@@ -1,0 +1,7 @@
+twitchAPI
+websockets
+pandas
+scikit-learn
+transformers
+torch
+streamlit
