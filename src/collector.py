@@ -56,7 +56,9 @@ async def listen():
 
         print(f"✅ Connecté au chat de {CHANNEL}")
 
-        json_file = "./data/chat_messages.json"
+        # Créer le fichier JSON s'il n'existe pas
+        channel_name = CHANNEL.replace("#", "")
+        json_file = f"data/chat_messages_{channel_name}.json"
         if not os.path.exists(json_file):
             with open(json_file, "w") as f:
                 json.dump([], f)
@@ -88,7 +90,7 @@ async def main():
         print(f"🎥 {CHANNEL_NAME} est EN LIVE ! Connexion au chat...")
         await listen()
     else:
-        print(f"❌ {CHANNEL_NAME} n’est pas en live. Fin du programme.")
+        print(f"❌ {CHANNEL_NAME} n'est pas en live. Fin du programme.")
 
 if __name__ == "__main__":
     asyncio.run(main())
