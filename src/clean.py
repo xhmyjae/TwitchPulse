@@ -5,6 +5,17 @@ import string
 from unidecode import unidecode
 from transformers import AutoTokenizer, AutoModel
 import torch
+import nltk
+from nltk.corpus import stopwords
+
+# Télécharger les stop words français si pas déjà fait
+try:
+    nltk.data.find('corpora/stopwords')
+except LookupError:
+    nltk.download('stopwords')
+
+# Récupérer les stop words français
+french_stop_words = set(stopwords.words('french'))
 
 # Model BErT et tokenizer
 tokenizer = AutoTokenizer.from_pretrained("dbmdz/bert-base-french-europeana-cased")
@@ -42,10 +53,18 @@ def clean_messages(df):
     df['content'] = df['content'].apply(lambda x: x.translate(str.maketrans('', '', string.punctuation)))
     
     # Supprimer les chiffres (a verifier s'ils peuvent etre utiles par moment, pour l'instant non)
-    df['content'] = df['content'].apply(lambda x: re.sub(r'\d+', '', x))
+    # df['content'] = df['content'].apply(lambda x: re.sub(r'\d+', '', x))
     
     # Supprimer les espaces multiples
     df['content'] = df['content'].apply(lambda x: re.sub(r'\s+', ' ', x).strip())
+    
+    # Supprimer les stop words
+    def remove_stop_words(text):
+        words = text.split()
+        filtered_words = [word for word in words if word.lower() not in french_stop_words]
+        return ' '.join(filtered_words)
+    
+    df['content'] = df['content'].apply(remove_stop_words)
     
     # Tokenization avec BERT
     def process_with_bert(text):
