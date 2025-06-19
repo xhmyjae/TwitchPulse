@@ -8,16 +8,16 @@ import torch
 import nltk
 from nltk.corpus import stopwords
 
-# Télécharger les stop words français si pas déjà fait
+# DL les stop words français
 try:
     nltk.data.find('corpora/stopwords')
 except LookupError:
     nltk.download('stopwords')
 
-# Récupérer les stop words français
+# Get les stop words français
 french_stop_words = set(stopwords.words('french'))
 
-# Model BErT et tokenizer
+# Model BERT et tokenizer
 tokenizer = AutoTokenizer.from_pretrained("dbmdz/bert-base-french-europeana-cased")
 model = AutoModel.from_pretrained("dbmdz/bert-base-french-europeana-cased")
 
@@ -52,7 +52,7 @@ def clean_messages(df):
     # Supprimer la ponctuation
     df['content'] = df['content'].apply(lambda x: x.translate(str.maketrans('', '', string.punctuation)))
     
-    # Supprimer les chiffres (a verifier s'ils peuvent etre utiles par moment, pour l'instant non)
+    # Supprimer les chiffres (a verifier si ca peut etre utile par moment, pour l'instant non)
     # df['content'] = df['content'].apply(lambda x: re.sub(r'\d+', '', x))
     
     # Supprimer les espaces multiples
