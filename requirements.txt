@@ -7,3 +7,5 @@ streamlit
 nltk
 emoji
 unidecode
+sentence-transformers
+numpy
