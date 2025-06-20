@@ -9,3 +9,7 @@ emoji
 unidecode
 sentence-transformers
 numpy
+matplotlib
+seaborn
+plotly
+scipy
