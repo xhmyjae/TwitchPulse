@@ -7,16 +7,16 @@ import spacy
 import nltk
 from nltk.corpus import stopwords
 
-# DL les stop words français
+# DL les stop words FR
 try:
     nltk.data.find('corpora/stopwords')
 except LookupError:
     nltk.download('stopwords')
 
-# Get les stop words français
+# Get les stop words FR
 french_stop_words = set(stopwords.words('french'))
 
-# Charger le modèle spaCy français
+# Model Spacy FR
 try:
     nlp = spacy.load("fr_core_news_sm")
 except OSError:
@@ -70,15 +70,27 @@ def clean_messages(df):
     
     df['content'] = df['content'].apply(remove_stop_words)
     
-    # Tokenization avec spaCy
+    # Lemmatisation avec Spacy
+    def lemmatize_text(text):
+        if not text.strip():
+            return ""
+        # Traiter texte
+        doc = nlp(text)
+        # Extraire les lemmes
+        lemmas = [token.lemma_ for token in doc if not token.is_space and not token.is_punct]
+        # Join lemmes en texte
+        return ' '.join(lemmas)
+    
+    df['content'] = df['content'].apply(lemmatize_text)
+    
+    # Tokenization avec Spacy
     def process_with_spacy(text):
         if not text.strip():
             return ""
-        # Traiter le texte avec spaCy
         doc = nlp(text)
-        # Extraire les tokens (mots) et les lemmes
+        # Extraire les tokens et les lemmes
         tokens = [token.lemma_ for token in doc if not token.is_space and not token.is_punct]
-        # Rejoindre les tokens en texte
+        # Join les tokens en texte
         return ' '.join(tokens)
     
     df['content'] = df['content'].apply(process_with_spacy)
