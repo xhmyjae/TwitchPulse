@@ -2,7 +2,8 @@ twitchAPI
 websockets
 pandas
 scikit-learn
-transformers
-torch
+spacy
 streamlit
 nltk
+emoji
+unidecode

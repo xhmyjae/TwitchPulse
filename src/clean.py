@@ -3,8 +3,7 @@ import re
 import emoji
 import string
 from unidecode import unidecode
-from transformers import AutoTokenizer, AutoModel
-import torch
+import spacy
 import nltk
 from nltk.corpus import stopwords
 
@@ -17,13 +16,18 @@ except LookupError:
 # Get les stop words français
 french_stop_words = set(stopwords.words('french'))
 
-# Model BERT et tokenizer
-tokenizer = AutoTokenizer.from_pretrained("dbmdz/bert-base-french-europeana-cased")
-model = AutoModel.from_pretrained("dbmdz/bert-base-french-europeana-cased")
+# Charger le modèle spaCy français
+try:
+    nlp = spacy.load("fr_core_news_sm")
+except OSError:
+    print("Modèle spaCy français non trouvé. Installation en cours...")
+    import subprocess
+    subprocess.run(["python", "-m", "spacy", "download", "fr_core_news_sm"])
+    nlp = spacy.load("fr_core_news_sm")
 
 def clean_messages(df):
     """
-    Nettoie les messages du chat Twitch en utilisant BERT.
+    Nettoie les messages du chat Twitch en utilisant spaCy.
     
     Args:
         df (pandas.DataFrame): DataFrame contenant les messages à nettoyer
@@ -66,14 +70,18 @@ def clean_messages(df):
     
     df['content'] = df['content'].apply(remove_stop_words)
     
-    # Tokenization avec BERT
-    def process_with_bert(text):
-        # Tokenize le texte
-        tokens = tokenizer.tokenize(text)
+    # Tokenization avec spaCy
+    def process_with_spacy(text):
+        if not text.strip():
+            return ""
+        # Traiter le texte avec spaCy
+        doc = nlp(text)
+        # Extraire les tokens (mots) et les lemmes
+        tokens = [token.lemma_ for token in doc if not token.is_space and not token.is_punct]
         # Rejoindre les tokens en texte
         return ' '.join(tokens)
     
-    df['content'] = df['content'].apply(process_with_bert)
+    df['content'] = df['content'].apply(process_with_spacy)
     
     return df
 
